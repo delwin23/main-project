@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Disburse Credit Card{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg" style="border-radius: 15px; background: linear-gradient(135deg, #84fab0, #8fd3f4);">
+                <div class="card-header text-white">
+                    <h3 class="mb-0">Disburse Credit Card - {{ card.full_name }}</h3>
+                </div>
+                <div class="card-body bg-white">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Card Details</h5>
+                            <p><strong>Applicant:</strong> {{ card.full_name }}</p>
+                            <p><strong>Email:</strong> {{ card.email }}</p>
+                            <p><strong>Phone:</strong> {{ card.phone_number }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Financial Information</h5>
+                            <p><strong>CIBIL Score:</strong> {{ card.cibil_score }}</p>
+                            <p><strong>Annual Income:</strong> ₹{{ card.annual_income }}</p>
+                            <p><strong>Employment Status:</strong> {{ card.employment_status }}</p>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="credit_limit" class="form-label">Credit Limit (₹)</label>
+                                <input type="number" class="form-control" id="credit_limit" name="credit_limit" value="{{ suggested_credit_limit }}" min="10000" max="1000000" step="1000" required>
+                                <div class="form-text">Suggested limit based on applicant's profile</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="interest_rate" class="form-label">Interest Rate (%)</label>
+                                <input type="number" class="form-control" id="interest_rate" name="interest_rate" value="{{ suggested_interest_rate }}" min="9.99" max="36.00" step="0.01" required>
+                                <div class="form-text">Suggested rate based on CIBIL score</div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-credit-card me-2"></i> Disburse Credit Card
+                            </button>
+                            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary btn-lg ms-2">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

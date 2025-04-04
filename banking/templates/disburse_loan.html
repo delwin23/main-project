@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Disburse Loan{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Disburse Loan to {{ loan.user.username }}</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Loan Application Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Applicant:</strong> {{ loan.full_name }}</p>
+                    <p><strong>Email:</strong> {{ loan.email }}</p>
+                    <p><strong>Phone:</strong> {{ loan.phone_number }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Loan Amount:</strong> ₹{{ loan.loan_amount }}</p>
+                    <p><strong>Loan Purpose:</strong> {{ loan.loan_purpose }}</p>
+                    <p><strong>Duration:</strong> {{ loan.loan_duration }} months</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Disbursement Details</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="loan_amount" class="form-label">Loan Amount</label>
+                    <input type="text" class="form-control" id="loan_amount" value="₹{{ loan.loan_amount }}" disabled>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="interest_rate" class="form-label">Annual Interest Rate (%)</label>
+                    <input type="number" class="form-control" id="interest_rate" name="interest_rate" min="1" max="30" step="0.01" value="10.00" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="tenure" class="form-label">Tenure</label>
+                    <input type="text" class="form-control" id="tenure" value="{{ loan.loan_duration }} months" disabled>
+                </div>
+                
+                <div class="alert alert-info">
+                    <p class="mb-0">
+                        <strong>Note:</strong> Upon disbursement, the loan amount will be credited to the user's account, 
+                        and monthly installments will be automatically scheduled.
+                    </p>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success btn-lg">Disburse Loan</button>
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

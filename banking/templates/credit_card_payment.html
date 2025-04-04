@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Pay Credit Card Bill{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg" style="border-radius: 15px;">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Pay Credit Card Bill</h3>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-credit-card fa-3x text-primary mb-3"></i>
+                        <h4>Payment Details</h4>
+                        <p class="lead">Amount: ₹{{ amount }}</p>
+                        <p>Due Date: {{ billing.due_date }}</p>
+                    </div>
+                    
+                    <button id="rzp-button" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-money-bill-wave me-2"></i> Pay Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ amount|floatformat:2|cut:'.' }}00",
+        "currency": "INR",
+        "name": "Bank System",
+        "description": "Credit Card Bill Payment",
+        "order_id": "{{ order_id }}",
+        "handler": function (response) {
+            document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+            document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+            document.getElementById('razorpay_signature').value = response.razorpay_signature;
+            document.getElementById('razorpay-form').submit();
+        },
+        "prefill": {
+            "name": "{{ request.user.username }}",
+            "email": "{{ request.user.email }}"
+        },
+        "theme": {
+            "color": "#673ab7"
+        }
+    };
+    var rzp = new Razorpay(options);
+    document.getElementById('rzp-button').onclick = function(e){
+        rzp.open();
+        e.preventDefault();
+    }
+</script>
+
+<form action="{% url 'razorpay_credit_card_callback' %}" method="POST" id="razorpay-form" style="display: none;">
+    {% csrf_token %}
+    <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+    <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+    <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+</form>
+{% endblock %}

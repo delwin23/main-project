@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Check Loan Eligibility{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary"><i class="fas fa-money-check-alt"></i> Loan Eligibility Check</h2>
+        <p class="text-muted">Fill in the details below to check your eligibility instantly.</p>
+    </div>
+
+    <div class="card shadow-lg p-4 border-0 rounded-4">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="fw-bold">Number of Dependents</label>
+                    <input type="number" name="num_dependents" class="form-control rounded-pill" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="fw-bold">Education (1=Graduate, 0=Not Graduate)</label>
+                    <input type="number" name="education" class="form-control rounded-pill" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="fw-bold">Self Employed (1=Yes, 0=No)</label>
+                    <input type="number" name="self_employed" class="form-control rounded-pill" required>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label class="fw-bold">Annual Income (₹)</label>
+                    <input type="number" name="income_annum" class="form-control rounded-pill" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="fw-bold">Loan Amount (₹)</label>
+                    <input type="number" name="loan_amount" class="form-control rounded-pill" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="fw-bold">Loan Term (Months)</label>
+                    <input type="number" name="loan_term" class="form-control rounded-pill" required>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label class="fw-bold">CIBIL Score</label>
+                    <input type="number" name="cibil_score" class="form-control rounded-pill" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="fw-bold">Residential Asset Value (₹)</label>
+                    <input type="number" name="residential_assets_value" class="form-control rounded-pill" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="fw-bold">Commercial Asset Value (₹)</label>
+                    <input type="number" name="commercial_assets_value" class="form-control rounded-pill" required>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label class="fw-bold">Luxury Asset Value (₹)</label>
+                    <input type="number" name="luxury_assets_value" class="form-control rounded-pill" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="fw-bold">Bank Asset Value (₹)</label>
+                    <input type="number" name="bank_asset_value" class="form-control rounded-pill" required>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success btn-lg shadow rounded-pill px-4 animated-button">
+                    <i class="fas fa-search me-2"></i> Check Eligibility
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {% if messages %}
+        <div class="mt-4">
+            {% for message in messages %}
+                <div class="alert alert-custom alert-{{ message.tags }} text-center shadow-lg rounded-4 fade-in">
+                    <i class="fas fa-info-circle"></i> {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Stylish Button */
+    .animated-button {
+        transition: all 0.3s ease-in-out;
+    }
+    .animated-button:hover {
+        background-color: #28a745;
+        transform: scale(1.07);
+        box-shadow: 0 0 15px rgba(40, 167, 69, 0.6);
+    }
+
+    /* Colorful Alerts */
+    .alert-custom {
+        color: white;
+        padding: 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    .alert-success {
+        background: linear-gradient(45deg, #28a745, #4caf50);
+    }
+    .alert-warning {
+        background: linear-gradient(45deg, #ff9800, #ff5722);
+    }
+    .alert-danger {
+        background: linear-gradient(45deg, #f44336, #d32f2f);
+    }
+    .alert-info {
+        background: linear-gradient(45deg, #2196f3, #03a9f4);
+    }
+
+    /* Smooth Fade-in Animation for Messages */
+    .fade-in {
+        animation: fadeIn 0.8s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

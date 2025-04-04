@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Credit Card Payment Details{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold" style="color: #673ab7; text-shadow: 1px 1px 2px #4527a0;">
+            💳 Credit Card Details
+        </h2>
+        <p class="text-muted">Manage your credit card payments</p>
+    </div>
+
+    <div class="card shadow-lg p-4 mb-4" style="border-radius: 15px; background: linear-gradient(135deg, #84fab0, #8fd3f4);">
+        <h4 class="text-white fw-bold">Card Information</h4>
+        <div class="card bg-white shadow p-3">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Credit Limit:</strong> ₹{{ disbursement.credit_limit }}</p>
+                    <p><strong>Annual Fee:</strong> ₹{{ disbursement.annual_fee }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Interest Rate:</strong> {{ disbursement.interest_rate }}% per annum</p>
+                    <p><strong>Issue Date:</strong> {{ disbursement.disbursement_date }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-lg p-4" style="border-radius: 15px; background: linear-gradient(135deg, #fd868c, #fda085);">
+        <h4 class="text-white fw-bold">Payment History</h4>
+        <table class="table table-hover text-center bg-white shadow rounded">
+            <thead class="table-dark">
+                <tr>
+                    <th>Bill Date</th>
+                    <th>Due Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bill in bills %}
+                <tr>
+                    <td>{{ bill.bill_date }}</td>
+                    <td>{{ bill.due_date }}</td>
+                    <td><b>₹{{ bill.amount }}</b></td>
+                    <td>
+                        {% if bill.status == "Paid" %}
+                            <span class="badge bg-success">✔ Paid</span>
+                        {% elif bill.status == "Pending" %}
+                            <span class="badge bg-warning text-dark">⌛ Pending</span>
+                        {% else %}
+                            <span class="badge bg-danger">❌ Overdue</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if bill.is_payable %}
+                            <a href="{% url 'generate_card_payment_order' bill.id %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-money-bill-wave me-1"></i> Pay Now
+                            </a>
+                        {% elif bill.status == "Paid" %}
+                            <span class="text-success"><i class="fas fa-check-circle me-1"></i> Paid on {{ bill.payment_date|date }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-muted">No bills generated yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

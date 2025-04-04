@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Billing Details{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary" style="text-shadow: 1px 1px 2px #4527a0;">
+            🧾 Billing Details
+        </h2>
+        <p class="text-muted">Detailed information about your credit card bill</p>
+    </div>
+    
+    <!-- Billing Information -->
+    <div class="card shadow-lg mb-4">
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0">Bill #{{ billing.id }}</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Billing Information</h5>
+                    <table class="table">
+                        <tr>
+                            <th>Due Date:</th>
+                            <td>{{ billing.due_date }}</td>
+                        </tr>
+                        <tr>
+                            <th>Amount:</th>
+                            <td>₹{{ billing.amount }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td>
+                                {% if billing.status == "Paid" %}
+                                    <span class="badge bg-success">✔ Paid</span>
+                                {% elif billing.status == "Pending" %}
+                                    <span class="badge bg-warning text-dark">⌛ Pending</span>
+                                {% else %}
+                                    <span class="badge bg-danger">❌ Overdue</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h5>Card Information</h5>
+                    <table class="table">
+                        <tr>
+                            <th>Cardholder:</th>
+                            <td>{{ card.full_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Credit Limit:</th>
+                            <td>₹{{ disbursement.credit_limit }}</td>
+                        </tr>
+                        <tr>
+                            <th>Interest Rate:</th>
+                            <td>{{ disbursement.interest_rate }}%</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            {% if payment_info %}
+            <div class="mt-4">
+                <h5>Payment Information</h5>
+                <div class="alert alert-success">
+                    <p><strong>Payment ID:</strong> {{ payment_info.id }}</p>
+                    <p><strong>Payment Date:</strong> {{ payment_info.date }}</p>
+                    <p><strong>Amount Paid:</strong> ₹{{ payment_info.amount }}</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="mt-4 text-center">
+                {% if billing.is_payable %}
+                    <a href="{% url 'create_credit_card_payment_order' billing.id %}" class="btn btn-primary">
+                        <i class="fas fa-credit-card me-1"></i> Pay Now
+                    </a>
+                {% endif %}
+                <a href="{% url 'credit_card_details' card.id %}" class="btn btn-secondary ms-2">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Credit Card
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

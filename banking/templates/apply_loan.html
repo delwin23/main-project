@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg p-4" style="border-radius: 15px; background: linear-gradient(135deg, #f8f9fa, #e3f2fd);">
+        <h2 class="text-center fw-bold mb-4" style="color: #007bff; text-shadow: 1px 1px 2px #0056b3;">📄 Apply for a Loan</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <h4 class="fw-bold p-2 text-white rounded" style="background: linear-gradient(90deg, #ff758c, #ff7eb3);">🔹 Personal Details</h4>
+            <div class="mb-3">
+                <label class="form-label"><i class="fas fa-user me-2 text-primary"></i> Full Name</label>
+                <input type="text" class="form-control border-primary" name="full_name" required>
+            </div>
+
+           <!-- Replace the email field with this updated version -->
+<div class="mb-3">
+    <label class="form-label"><i class="fas fa-envelope me-2 text-success"></i> Email</label>
+    <div class="input-group">
+        <input type="email" class="form-control border-success" name="email" id="email-field" required>
+        <button type="button" class="btn btn-success" id="send-otp-btn">Verify with OTP</button>
+    </div>
+</div>
+
+<!-- Add this OTP verification section below the email field -->
+<div class="mb-3 d-none" id="otp-verification-section">
+    <div class="card border-success mb-3">
+        <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-key me-2"></i>Email Verification</h5>
+            <p class="card-text">An OTP has been sent to your email. Please enter it below to verify.</p>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" id="otp-input" placeholder="Enter 6-digit OTP" maxlength="6">
+                <button class="btn btn-outline-success" type="button" id="verify-otp-btn">Verify</button>
+            </div>
+            <div class="d-none" id="otp-success-message">
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i> Email verified successfully!
+                </div>
+            </div>
+            <div class="d-none" id="otp-error-message">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i> Invalid OTP. Please try again.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add a hidden input field to track verification status -->
+<input type="hidden" name="email_verified" id="email-verified-field" value="false">
+
+            <div class="mb-3">
+                <label class="form-label"><i class="fas fa-phone-alt me-2 text-danger"></i> Phone Number</label>
+                <input type="text" class="form-control border-danger" name="phone_number" required>
+            </div>
+
+            <h4 class="fw-bold p-2 text-white rounded" style="background: linear-gradient(90deg, #36d1dc, #5b86e5);">💰 Loan Details</h4>
+            <div class="mb-3">
+                <label class="form-label"><i class="fas fa-money-bill-wave me-2 text-warning"></i> Loan Amount</label>
+                <input type="number" class="form-control border-warning" name="loan_amount" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><i class="fas fa-comment-dollar me-2 text-info"></i> Loan Purpose</label>
+                <textarea class="form-control border-info" name="loan_purpose" required></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><i class="fas fa-briefcase me-2 text-secondary"></i> Employment Type</label>
+                <select class="form-control border-secondary" name="employment_type">
+                    <option value="Salaried">Salaried</option>
+                    <option value="Self-Employed">Self-Employed</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><i class="fas fa-coins me-2 text-success"></i> Monthly Income</label>
+                <input type="number" class="form-control border-success" name="monthly_income" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><i class="fas fa-calendar-alt me-2 text-danger"></i> Loan Duration (months)</label>
+                <input type="number" class="form-control border-danger" name="loan_duration" required>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" name="existing_loans">
+                <label class="form-check-label">Do you have any existing loans?</label>
+            </div>
+
+            <h4 class="fw-bold p-2 text-white rounded" style="background: linear-gradient(90deg, #ff9966, #ff5e62);">📎 Upload Documents</h4>
+            <div class="mb-3">
+                <label class="form-label"><i class="fas fa-id-card me-2 text-primary"></i> ID Proof (Required)</label>
+                <input type="file" class="form-control border-primary" name="id_proof" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><i class="fas fa-file-alt me-2 text-success"></i> Possession Certificate (Optional)</label>
+                <input type="file" class="form-control border-success" name="possession_certificate">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><i class="fas fa-receipt me-2 text-warning"></i> Salary Slip (Optional)</label>
+                <input type="file" class="form-control border-warning" name="salary_slip">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><i class="fas fa-pen me-2 text-danger"></i> Written Request (Required)</label>
+                <input type="file" class="form-control border-danger" name="written_request" required>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-lg shadow-lg text-white" style="background: linear-gradient(90deg, #ff7eb3, #ff758c); border: none; padding: 10px 30px; font-size: 1.2rem; transition: 0.3s;">
+                    <i class="fas fa-paper-plane me-2"></i> Submit Application
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Get references to DOM elements
+        const sendOtpBtn = document.getElementById('send-otp-btn');
+        const emailField = document.getElementById('email-field');
+        const otpSection = document.getElementById('otp-verification-section');
+        const otpInput = document.getElementById('otp-input');
+        const verifyOtpBtn = document.getElementById('verify-otp-btn');
+        const otpSuccessMsg = document.getElementById('otp-success-message');
+        const otpErrorMsg = document.getElementById('otp-error-message');
+        const emailVerifiedField = document.getElementById('email-verified-field');
+        const submitBtn = document.querySelector('button[type="submit"]');
+        
+        // Initially disable the submit button until email is verified
+        submitBtn.disabled = true;
+        
+        // Event listener for sending OTP
+        sendOtpBtn.addEventListener('click', function() {
+            const email = emailField.value.trim();
+            
+            // Basic email validation
+            if (!email || !isValidEmail(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+            // Send OTP via AJAX
+            fetch('/send-otp/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({ email: email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show OTP verification section
+                    otpSection.classList.remove('d-none');
+                    // Disable email field and send OTP button
+                    emailField.readOnly = true;
+                    sendOtpBtn.disabled = true;
+                    sendOtpBtn.textContent = 'OTP Sent';
+                    sendOtpBtn.classList.replace('btn-success', 'btn-secondary');
+                    
+                    // Set a timeout to re-enable the send OTP button after 60 seconds
+                    setTimeout(() => {
+                        sendOtpBtn.disabled = false;
+                        sendOtpBtn.textContent = 'Resend OTP';
+                        sendOtpBtn.classList.replace('btn-secondary', 'btn-success');
+                    }, 60000);
+                } else {
+                    alert('Failed to send OTP. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        });
+        
+        // Event listener for verifying OTP
+        verifyOtpBtn.addEventListener('click', function() {
+            const otp = otpInput.value.trim();
+            const email = emailField.value.trim();
+            
+            // Basic OTP validation
+            if (!otp || otp.length !== 6 || !/^\d+$/.test(otp)) {
+                alert('Please enter a valid 6-digit OTP.');
+                return;
+            }
+            
+            // Verify OTP via AJAX
+            fetch('/verify-otp/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({ email: email, otp: otp })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    otpSuccessMsg.classList.remove('d-none');
+                    otpErrorMsg.classList.add('d-none');
+                    
+                    // Update verification status
+                    emailVerifiedField.value = 'true';
+                    
+                    // Disable OTP input and verify button
+                    otpInput.readOnly = true;
+                    verifyOtpBtn.disabled = true;
+                    
+                    // Enable submit button
+                    submitBtn.disabled = false;
+                } else {
+                    // Show error message
+                    otpErrorMsg.classList.remove('d-none');
+                    otpSuccessMsg.classList.add('d-none');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        });
+        
+        // Helper function to validate email format
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+        
+        // Form submission validation
+        document.getElementById('loanForm').addEventListener('submit', function(event) {
+            if (emailVerifiedField.value !== 'true') {
+                event.preventDefault();
+                alert('Please verify your email with OTP before submitting the form.');
+            }
+        });
+    });
+    </script>
+
+
+
+
+
+
+
+{% endblock %}

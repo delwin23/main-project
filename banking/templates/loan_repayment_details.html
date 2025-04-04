@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% block title %}Loan Repayment Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Loan Repayment Details</h2>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Loan Summary</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Loan Amount:</strong> ₹{{ disbursement.loan_amount }}</p>
+                    <p><strong>Interest Rate:</strong> {{ disbursement.interest_rate }}%</p>
+                    <p><strong>Tenure:</strong> {{ disbursement.tenure_months }} months</p>
+                    <p><strong>Monthly Installment:</strong> ₹{{ disbursement.monthly_installment }}</p>
+                    <p><strong>Total Repayment Amount:</strong> ₹{{ disbursement.total_repayment_amount }}</p>
+                    <p><strong>Disbursement Date:</strong> {{ disbursement.disbursement_date }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Account Status</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Current Balance:</strong> ₹{{ current_balance }}</p>
+                    
+                    {% if next_installment %}
+                    <div class="alert alert-warning">
+                        <p><strong>Next Due Date:</strong> {{ next_installment.due_date }}</p>
+                        <p><strong>Next Installment Amount:</strong> ₹{{ next_installment.amount }}</p>
+                        
+                        {% if next_installment.is_payable %}
+                        <button 
+                            class="btn btn-primary mt-2 pay-now-btn" 
+                            data-installment-id="{{ next_installment.id }}"
+                            data-amount="{{ next_installment.amount }}">
+                            Pay Now
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <p><strong>Projected Balance After All Payments:</strong> ₹{{ simulated_balance }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Installment Schedule</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Due Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for installment in installments %}
+                        <tr class="{% if installment.status == 'Paid' %}table-success{% elif installment.status == 'Overdue' %}table-danger{% endif %}">
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ installment.due_date }}</td>
+                            <td>₹{{ installment.amount }}</td>
+                            <td>
+                                <span class="badge {% if installment.status == 'Paid' %}bg-success{% elif installment.status == 'Overdue' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ installment.status }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if installment.is_payable %}
+                                <button 
+                                    class="btn btn-sm btn-primary pay-now-btn" 
+                                    data-installment-id="{{ installment.id }}"
+                                    data-amount="{{ installment.amount }}">
+                                    Pay Now
+                                </button>
+                                {% elif installment.status == 'Paid' %}
+                                <span class="text-success">
+                                    <i class="fas fa-check-circle"></i> Paid on {{ installment.payment_date|date:"d M Y" }}
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{% if user.is_superuser %}{% url 'admin_dashboard' %}{% else %}{% url 'application_status' %}{% endif %}" class="btn btn-primary">
+            Back
+        </a>
+    </div>
+</div>
+
+<!-- Razorpay Script Integration -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const payButtons = document.querySelectorAll('.pay-now-btn');
+        
+        payButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const installmentId = this.getAttribute('data-installment-id');
+                
+                fetch(`/installment/${installmentId}/create-order/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert(data.error);
+                            return;
+                        }
+                        
+                        const options = {
+                            key: "{{ razorpay_key_id }}",
+                            amount: data.amount,
+                            currency: data.currency,
+                            name: "Your Bank Name",
+                            description: data.description,
+                            order_id: data.id,
+                            prefill: {
+                                name: data.prefill.name,
+                                email: data.prefill.email,
+                                contact: data.prefill.contact
+                            },
+                            theme: { color: "#3399cc" },
+                            handler: function(response) {
+                                const form = document.createElement('form');
+                                form.method = 'POST';
+                                form.action = "{% url 'razorpay_callback' %}";
+                                
+                                const csrfToken = document.createElement('input');
+                                csrfToken.type = 'hidden';
+                                csrfToken.name = 'csrfmiddlewaretoken';
+                                csrfToken.value = '{{ csrf_token }}';
+                                form.appendChild(csrfToken);
+                                
+                                for (const key in response) {
+                                    const input = document.createElement('input');
+                                    input.type = 'hidden';
+                                    input.name = key;
+                                    input.value = response[key];
+                                    form.appendChild(input);
+                                }
+                                document.body.appendChild(form);
+                                form.submit();
+                            }
+                        };
+                        
+                        const razorpayCheckout = new Razorpay(options);
+                        razorpayCheckout.open();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to create payment. Please try again.');
+                    });
+            });
+        });
+    });
+</script>
+{% endblock %}

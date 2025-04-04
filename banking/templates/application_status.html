@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Application Status{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold" style="color: #673ab7; text-shadow: 1px 1px 2px #4527a0;">
+            📋 Your Applications
+        </h2>
+        <p class="text-muted">Track the status of your loan and credit card applications below.</p>
+    </div>
+
+    <!-- Loan Applications Section -->
+<div class="card shadow-lg p-4 mb-4" style="border-radius: 15px; background: linear-gradient(135deg, #f6d365, #fda085);">
+    <h4 class="fw-bold text-white">
+        💰 Loan Applications
+    </h4>
+    <table class="table table-hover text-center bg-white shadow rounded">
+        <thead class="table-dark">
+            <tr>
+                <th>Amount</th>
+                <th>Applied Date</th>
+                <th>Status</th>
+                <th>Action</th> <!-- New column for the action button -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for loan in loans %}
+            <tr>
+                <td><b>₹{{ loan.loan_amount }}</b></td>
+                <td>{{ loan.applied_date }}</td>
+                <td>
+                    {% if loan.status == "Approved" %}
+                        <span class="badge bg-success">✔ Approved</span>
+                    {% elif loan.status == "Pending" %}
+                        <span class="badge bg-warning text-dark">⌛ Pending</span>
+                    {% else %}
+                        <span class="badge bg-danger">❌ Rejected</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if loan.status == "Approved" and loan.disbursement %}
+                        <a href="{% url 'loan_repayment_details' loan.id %}" class="btn btn-info btn-sm">
+                            <i class="fas fa-file-invoice-dollar me-1"></i> View Repayment Details
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-muted">No loan applications found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+    <!-- Update the Credit Card Applications Section in application_status.html -->
+<div class="card shadow-lg p-4" style="border-radius: 15px; background: linear-gradient(135deg, #84fab0, #8fd3f4);">
+    <h4 class="fw-bold text-white">
+        💳 Credit Card Applications
+    </h4>
+    <table class="table table-hover text-center bg-white shadow rounded">
+        <thead class="table-dark">
+            <tr>
+                <th>Status</th>
+                <th>Applied Date</th>
+                <th>Action</th> <!-- New column for the action button -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for card in cards %}
+            <tr>
+                <td>
+                    {% if card.status == "Approved" %}
+                        <span class="badge bg-success">✔ Approved</span>
+                    {% elif card.status == "Pending" %}
+                        <span class="badge bg-warning text-dark">⌛ Pending</span>
+                    {% else %}
+                        <span class="badge bg-danger">❌ Rejected</span>
+                    {% endif %}
+                </td>
+                <td>{{ card.applied_date }}</td>
+                <td>
+                    {% if card.status == "Approved" and card.disbursement %}
+                        <a href="{% url 'credit_card_details' card.id %}" class="btn btn-info btn-sm">
+                            <i class="fas fa-credit-card me-1"></i> View Card Details
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-muted">No credit card applications found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">Welcome, {{ user.username }} 👋</h2>
+    </div>
+
+    <div class="card shadow-lg p-4 text-center">
+        <h4 class="fw-bold">💰 Account Balance</h4>
+        <h3 class="text-success fw-bold mt-2">₹{{ balance }}</h3>
+    </div>
+
+    <div class="d-flex justify-content-center gap-3 mt-4">
+        <a href="{% url 'apply_loan' %}" class="btn btn-primary btn-lg shadow">
+            <i class="fas fa-hand-holding-usd me-2"></i> Apply for Loan
+        </a>
+        <a href="{% url 'apply_credit_card' %}" class="btn btn-warning btn-lg shadow">
+            <i class="fas fa-credit-card me-2"></i> Apply for Credit Card
+        </a>
+        <a href="{% url 'application_status' %}" class="btn btn-info btn-lg shadow">
+            <i class="fas fa-clipboard-list me-2"></i> Check Status
+        </a>
+        <a href="{% url 'check_loan_eligibility' %}" class="btn btn-success btn-lg shadow">
+            <i class="fas fa-check-circle me-2"></i> Check Loan Eligibility
+        </a>
+    </div>
+</div>
+{% endblock %}

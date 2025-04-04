@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 text-center text-primary fw-bold">🚀 Admin Dashboard</h2>
+
+    <!-- Upload CSV/Excel -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-gradient-primary text-white fw-bold">
+            📂 Upload Account Holder Details
+        </div>
+        <div class="card-body">
+            <form action="{% url 'upload_account_holders' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="file" name="file" class="form-control border-primary" accept=".csv, .xlsx" required>
+                    <button type="submit" class="btn btn-primary">📤 Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loan Applications -->
+<div class="card shadow mb-4">
+    <div class="card-header bg-gradient-dark text-white fw-bold">🏦 Loan Applications</div>
+    <div class="card-body">
+        <table class="table table-hover table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>👤 Full Name</th>
+                    <th>📧 Email</th>
+                    <th>📞 Phone</th>
+                    <th>💰 Loan Amount</th>
+                    <th>💼 Employment</th>
+                    <th>📊 Monthly Income</th>
+                    <th>🎯 Purpose</th>
+                    <th>📅 Duration</th>
+                    <th>📌 Status</th>
+                    <th>📑 Documents</th>
+                    <th>⚙️ Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loan in loans %}
+                <tr>
+                    <td>{{ loan.full_name }}</td>
+                    <td>{{ loan.email }}</td>
+                    <td>{{ loan.phone_number }}</td>
+                    <td><span class="text-success fw-bold">₹{{ loan.loan_amount }}</span></td>
+                    <td>{{ loan.employment_type }}</td>
+                    <td>₹{{ loan.monthly_income }}</td>
+                    <td>{{ loan.loan_purpose }}</td>
+                    <td>{{ loan.loan_duration }} months</td>
+                    <td>
+                        <span class="badge 
+                            {% if loan.status == 'Approved' %}bg-success 
+                            {% elif loan.status == 'Pending' %}bg-warning text-dark
+                            {% else %}bg-danger{% endif %}">
+                            {{ loan.status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if loan.id_proof %}
+                        <a href="{{ loan.id_proof.url }}" target="_blank" class="btn btn-sm btn-outline-primary">📄 ID Proof</a>
+                        {% endif %}
+                        {% if loan.possession_certificate %}
+                        <a href="{{ loan.possession_certificate.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">📜 Possession Certificate</a>
+                        {% endif %}
+                        {% if loan.salary_slip %}
+                        <a href="{{ loan.salary_slip.url }}" target="_blank" class="btn btn-sm btn-outline-success">💰 Salary Slip</a>
+                        {% endif %}
+                        {% if loan.written_request %}
+                        <a href="{{ loan.written_request.url }}" target="_blank" class="btn btn-sm btn-outline-danger">✍️ Written Request</a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if loan.status == "Pending" %}
+                        <a href="{% url 'approve_loan' loan.id %}" class="btn btn-success btn-sm">✅ Approve</a>
+                        <a href="{% url 'reject_loan' loan.id %}" class="btn btn-danger btn-sm">❌ Reject</a>
+                        {% else %}
+                        <button class="btn btn-secondary btn-sm" disabled>🚫 No Action</button>
+                        {% endif %}
+                        
+                        <!-- Add Disburse/View Repayment Buttons -->
+                        {% if loan.status == "Approved" and not loan.disbursement %}
+                        <a href="{% url 'disburse_loan' loan.id %}" class="btn btn-success btn-sm">
+                            <i class="fas fa-money-bill-wave me-1"></i> Disburse
+                        </a>
+                        {% elif loan.disbursement %}
+                        <a href="{% url 'loan_repayment_details' loan.id %}" class="btn btn-info btn-sm">
+                            <i class="fas fa-file-invoice-dollar me-1"></i> View Repayment
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+   <!-- Credit Card Applications -->
+   <div class="card shadow mb-4">
+    <div class="card-header bg-gradient-info text-white fw-bold">💳 Credit Card Applications</div>
+    <div class="card-body">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>👤 User</th>
+                    <th>📌 Status</th>
+                    <th>📑 Documents</th>
+                    <th>⚙️ Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for card in cards %}
+                <tr>
+                    <td>{{ card.user.username }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if card.status == 'Approved' %}bg-success 
+                            {% elif card.status == 'Pending' %}bg-warning text-dark
+                            {% else %}bg-danger{% endif %}">
+                            {{ card.status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if card.id_proof %}
+                        <a href="{{ card.id_proof.url }}" target="_blank" class="btn btn-sm btn-outline-primary">📄 ID Proof</a>
+                        {% endif %}
+                        {% if card.salary_slip %}
+                        <a href="{{ card.salary_slip.url }}" target="_blank" class="btn btn-sm btn-outline-success">💰 Salary Slip</a>
+                        {% endif %}
+                        {% if card.address_proof %}
+                        <a href="{{ card.address_proof.url }}" target="_blank" class="btn btn-sm btn-outline-danger">🏡 Address Proof</a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if card.status == "Pending" %}
+                        <a href="{% url 'approve_credit_card' card.id %}" class="btn btn-success btn-sm">✅ Approve</a>
+                        <a href="{% url 'reject_credit_card' card.id %}" class="btn btn-danger btn-sm">❌ Reject</a>
+                        {% elif card.status == "Approved" and not card.disbursement %}
+                        <a href="{% url 'disburse_credit_card' card.id %}" class="btn btn-success btn-sm">
+                            <i class="fas fa-credit-card me-1"></i> Disburse Card
+                        </a>
+                        {% elif card.disbursement %}
+                        <a href="{% url 'credit_card_details' card.id %}" class="btn btn-info btn-sm">
+                            <i class="fas fa-eye me-1"></i> View Details
+                        </a>
+                        {% else %}
+                        <button class="btn btn-secondary btn-sm" disabled>🚫 No Action</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+
+<style>
+.bg-gradient-primary { background: linear-gradient(90deg, #007bff, #0056b3); }
+.bg-gradient-dark { background: linear-gradient(90deg, #343a40, #212529); }
+.bg-gradient-info { background: linear-gradient(90deg, #17a2b8, #0f6674); }
+.btn-sm { transition: 0.3s ease-in-out; }
+.btn-sm:hover { transform: scale(1.1); }
+.table-hover tbody tr:hover { background-color: rgba(0, 0, 0, 0.05); }
+.badge { font-size: 14px; padding: 5px 10px; }
+</style>
+{% endblock %}
